@@ -1,25 +1,31 @@
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    background-color:white;
+}
+
 .grid {
     width: 220px;
     height: 400px;
+    @@ -12,6 +18,21 @@
+    height: 20px; 
+} 
+
+.next-piece-grid {
+    margin-left: 50px;
+    width: 120px;
+    height: 120px;
     display: flex;
     flex-wrap: wrap;
     background-color: white;
 }
 
-.grid div {
+.next-piece-grid div {
     margin: 1px;
-    width: 20px;
-    height: 20px;    
-}  
+    width: 28px;
+    height: 28px; 
+}
 
 .noPiece {
     background-color: red;
-}
-
-.piece {
-    background-color: blue;
-} 
-
-.freeze {
-    background-color: blue;
 }

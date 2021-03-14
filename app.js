@@ -1,61 +1,84 @@
 document.addEventListener('DOMContentLoaded', () => {
     const grid = document.querySelector('.grid')
     let squares = Array.from(document.querySelectorAll('.grid div'))
+    let nextSquares = Array.from(document.querySelectorAll('.next-piece-grid div'))
     const gameScore = document.querySelector('#score')
+    const gameOverMsg = document.querySelector('#gameover')
     const startBt = document.querySelector('#start-button')
     const restartBt = document.querySelector('#restart-button')
+    
+    const height = 10
+    
+    const iShape = drawIShape(height)
+    const zShape = drawZShape(height)
+    const lShape = drawLShape(height)
+    const strangeShape = drawStrangeShape(height)
+    const squareShape = drawSquareShape(height)
 
-    const height = 10  // Número que representa a posição logo abaixo de uma quadrado no grid (quadrado + height = quadrado abaixo)
+    function drawIShape(height) {
+        return [
+            [0, height, height*2, height*3], 
+            [0, -1, 1, 2],  
+            [0, height, height*2, height*3] ,
+            [height, height-1, height+1, height+2]        
+        ]
+    }
 
-    const iShape = [  // Peça em forma de I
-        [0, height, height*2, height*3], 
-        [0, -1, 1, 2],  
-        [0, height, height*2, height*3],
-        [height, height-1, height+1, height+2] 
-    ]
+    function drawZShape(height) {
+        return [
+            [0, +1, -height, height+1],
+            [0, +1, height, height-1],
+            [0, +1, -height, height+1],
+            [0, +1, height, height-1]
+        ]
+    }
 
-    const zShape = [  // Peça em forma de Z
-        [0, +1, -height, height+1],
-        [0, +1, height, height-1],
-        [0, +1, -height, height+1],
-        [0, +1, height, height-1]
-    ]
+    function drawLShape(height) {
+        return [
+            [0, -height, height, height+1],
+            [0, 1, -1, height-1],
+            [0, height, -height, -height-1],
+            [0, -1, +1, -height+1]
+        ]
+    }
 
-    const lShape = [  // Peça em forma de L
-        [0, -height, height, height+1],
-        [0, 1, -1, height-1],
-        [0, height, -height, -height-1],
-        [0, -1, +1, -height+1]
-    ]
+    function drawStrangeShape(height) {
+        return [
+            [0, -height, -1, 1],
+            [0, -height, height, 1],
+            [0, 1, -1, height],
+            [0, -height, height, -1]
+        ]
+    }
 
-    const strangeShape = [  // Quarta peça
-        [0, -height, -1, 1],
-        [0, -height, height, 1],
-        [0, 1, -1, height],
-        [0, -height, height, -1]
-    ]
+    function drawSquareShape(height) {
+        return [
+            [0, 1, height, height+1],
+            [0, 1, height, height+1],
+            [0, 1, height, height+1],
+            [0, 1, height, height+1]
+        ]
+    }
 
-    let pieces = [iShape, zShape, lShape, strangeShape]
+    let pieces = [iShape, zShape, lShape, strangeShape, squareShape]
     let currentPos
-    let currentRotate
+    let currentRotation
     let currentShape
-    let currentPiece
+    let currentPiece 
+    let nextShape
     let timerId
+    let score = 0
     let gameOver = false
     let started = null
 
-    /*
-    Retorna uma peça aleatória
-    */
     function nextPiece() {        
-        currentShape = Math.floor(Math.random() * pieces.length)
+        currentShape = nextShape
+        nextShape = Math.floor(Math.random() * pieces.length)
+        displayNext()
         return pieces[currentShape][0]
     }
 
-    /*
-    Desenha todo o grid (marca os quadrados como "noPiece")
-    */
-    function drawGrids() {        
+    function drawGrids() {
         for (let i=0; i<squares.length; i++) {  
             if (squares[i].classList.contains("noPiece")) {
                 squares[i].classList.remove("piece")    
@@ -63,24 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {                       
                 squares[i].classList.add("noPiece")     
             }       
-        }  
+        }      
     }
 
-    /*
-    Congela uma peça
-    */
-    function freezePiece() {
-        for (index of currentPiece) {
-            if (currentPos+index > 0) {
-                squares[currentPos + index].classList.add("freeze")
-            }
-        }
-        updatePiece()
-    }
-
-    /*
-    Apaga uma peça
-    */
     function undrawPiece() {
         for (index of currentPiece) {
             if (currentPos+index > 0) {
@@ -89,16 +97,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /*
-    Desenha uma peça
-    */
+    function freezePiece() {
+        for (index of currentPiece) {
+            if (currentPos+index > 0) {                
+                squares[currentPos + index].classList.add("freeze")                
+            }
+        }
+        updatePiece()
+    }
+
     function drawPiece() {
         let frozenPiece = false
         for (index of currentPiece) {
-            if(currentPos+index > 0){
+            if (currentPos+index > 0) {
                 if (squares[currentPos + index].classList.contains("freeze")) {
-                    freezePiece()
-                    console.log("asdasd")
+                    freezePiece()                    
                     frozenPiece = true
                 } else {
                     squares[currentPos + index].classList.add("piece")
@@ -110,41 +123,49 @@ document.addEventListener('DOMContentLoaded', () => {
         }        
     }
 
-    /*
-    Cria uma nova peça na parte de cima do grid
-    */
-    function updatePiece() {
-        currentPos = 4
-        currentPiece = nextPiece()
+    function displayNext() {
+        nextSquares.forEach(square => square.classList.remove("piece"))
+        let piece
+        if (nextShape === 0) {
+            piece = drawIShape(4)[0]
+        } else if (nextShape === 1) {
+            piece = drawZShape(4)[0]
+        } else if (nextShape === 2) {
+            piece = drawLShape(4)[0]
+        } else if (nextShape === 3) {
+            piece = drawStrangeShape(4)[0]
+        } else {
+            piece = drawSquareShape(4)[0]
+        }        
+        piece.forEach(index => nextSquares[index+5].classList.add("piece"))
     }
 
-    /*
-    Para a peça caso atenda às condições
-    */
+    function updatePiece() {
+        currentPos = 4
+        currentPiece = nextPiece()        
+    }
+
     function stop() {
         for (index of currentPiece) {
             if (index+currentPos+height > 199 || squares[index+currentPos+height].classList.contains("freeze")) {   
-                freezePiece()            
-                updatePiece()
+                freezePiece()       
                 break
             }                       
         }
     }
 
-    /*
-    Checa se o jogo acabou (game over)
-    */
     function chkGameOver() {
-        if (squares[4].classList.contains("freeze")) {          
-            console.log("Game")
+        if (squares[4].classList.contains("freeze")) {         
             clearInterval(timerId)
             timerId = null
+            gameOverMsg.innerHTML = "Game Over!!"
+            score = 0
             return true
         }
         return false
     }
 
-    function score() {
+    function addScore() {
         for (let i=0; i<200; i+=10) {
             complete = true
             for (let j=i; j<i+10; j++) {
@@ -154,6 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             if (complete) {
+                score += 10
+                gameScore.innerHTML = score
                 removedSquares = squares.splice(i, 10)
                 removedSquares.forEach(element => {
                     element.classList.remove("piece")    
@@ -165,29 +188,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /*
-    Move a peça atual para baixo
-    */
-    function moveDown() {         
-        stop()         
+    function moveDown() {     
+        stop()        
         undrawPiece()
         currentPos += height
-        drawPiece()           
+        drawPiece()        
         gameOver = chkGameOver() 
-        score()
+        addScore()
     }
 
-    /*
-    Move a peça atual para a esquerda
-    */
-    function moveLeft() {
+    function moveLeft() {      
         let atLimit = false
         let pieceOnLeft = false
         for (index of currentPiece) {
-            if ( (currentPos+index) % height === 0) {
+            if ((currentPos+index) % height === 0) {
                 atLimit = true
                 break
-            } else if ( (currentPos+index) > 0 && squares[currentPos+index-1].classList.contains("freeze")) {
+            } else if ((currentPos+index) > 0 && squares[currentPos+index-1].classList.contains("freeze")) {
                 pieceOnLeft = true
                 break
             }
@@ -196,20 +213,17 @@ document.addEventListener('DOMContentLoaded', () => {
             undrawPiece()
             currentPos -= 1
             drawPiece()
-        }       
+        }
     }
 
-    /*
-    Move a peça atual para a direita
-    */
-    function moveRight() {
+    function moveRight() {       
         let atLimit = false
         let pieceOnRight = false
         for (index of currentPiece) {
-            if ( (currentPos+index) % height === height-1) {                
+            if ((currentPos+index) % height === height-1) {                
                 atLimit = true
                 break
-            } else if ( (currentPos+index) > 0 && squares[currentPos+index+1].classList.contains("freeze")) {
+            } else if ((currentPos+index) > 0 && squares[currentPos+index+1].classList.contains("freeze")) {
                 pieceOnRight = true
                 break
             }
@@ -218,28 +232,23 @@ document.addEventListener('DOMContentLoaded', () => {
             undrawPiece()
             currentPos += 1
             drawPiece()
-        }
+        }         
     }
 
-    /*
-    Gira a peça atual
-    */
-    function rotate() {
-        if (currentRotate < 3) {
-            currentRotate++
+    function rotate() {        
+        if (currentRotation < 3) {
+            currentRotation++
         } else {
-            currentRotate = 0
-        }  
+            currentRotation = 0
+        }      
 
+        for (let i=0; i<3; i++)
         undrawPiece()
-        currentPiece = pieces[currentShape][currentRotate]
+        currentPiece = pieces[currentShape][currentRotation]
         drawPiece()
     }
 
-    /*
-    Move a peça de acordo com a tecla pressionada
-    */
-    function control(e) {
+    function control(e) { 
         if (!gameOver && started) {
             if (e.keyCode === 37) {                        
                 moveLeft()       
@@ -247,11 +256,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 rotate()           
             } else if (e.keyCode === 39) {     
                 moveRight()       
-            } else if (e.keyCode === 40) {
-                moveDown()           
             }
         }
-    }
+    }        
 
     function goDown(e) {
         if (!gameOver && started) {      
@@ -261,17 +268,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function startAndPause() {
+    function startAndPause() {     
         if (gameOver || started === null) {
             if (gameOver) {
                 drawGrids()
             }
-            gameOver = false
+            gameOver = false        
+            score = 0    
+            gameScore.innerHTML = score
+            gameOverMsg.innerHTML = ''
+            nextShape = Math.floor(Math.random() * pieces.length)            
             currentPos = 4
-            currentRotate = 0
+            currentRotation = 0
             currentShape
-            currentPiece = nextPiece()      
-            clearInterval(timerId)         
+            currentPiece = nextPiece()   
+            clearInterval(timerId)             
             timerId = setInterval(moveDown, 700)
             started = true
         } else if (started === true) {
@@ -280,15 +291,18 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             started = true
             timerId = setInterval(moveDown, 700)
-        }
-
+        }        
     }
-  
+
     function restartGame() {
         drawGrids()
-        gameOver = false            
+        gameOver = false      
+        score = 0      
+        gameScore.innerHTML = score
+        gameOverMsg.innerHTML = ''
+        nextShape = Math.floor(Math.random() * pieces.length)        
         currentPos = 4
-        currentRotate = 0
+        currentRotation = 0
         currentShape
         currentPiece = nextPiece()  
         clearInterval(timerId)             
@@ -297,8 +311,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     drawGrids()
+    nextSquares.forEach(square => square.classList.add("noPiece"))
     startBt.addEventListener('click', startAndPause)    
     restartBt.addEventListener('click', restartGame)
-    document.addEventListener('keyup', control)
+    document.addEventListener('keydown', control)
     document.addEventListener('keydown', goDown)
 })
