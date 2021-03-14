@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded'), () => {
+document.addEventListener('DOMContentLoaded', () => {
     const grid = document.querySelector('.grid')
     let squares = Array.from(document.querySelectorAll('.grid div'))
     const score = document.querySelector('#score')
@@ -35,11 +35,13 @@ document.addEventListener('DOMContentLoaded'), () => {
     ]
 
     let pieces = [iShape, zShape, lShape, strangeShape]
-    let currentPos = 4
-    let currentRotate = 0
+    let currentPos
+    let currentRotate
     let currentShape
-    let currentPiece = nextPiece()
-    timer = setInterval(moveDown, 700)
+    let currentPiece
+    let timerId
+    let gameOver = false
+    let started = null
 
     /*
     Retorna uma peça aleatória
@@ -52,10 +54,26 @@ document.addEventListener('DOMContentLoaded'), () => {
     /*
     Desenha todo o grid (marca os quadrados como "noPiece")
     */
-    function drawGrids() {
-        for (let i=0; i<squares.length; i++) {           
-            squares[i].classList.add("noPiece")            
+    function drawGrids() {        
+        for (let i=0; i<squares.length; i++) {  
+            if (squares[i].classList.contains("noPiece")) {
+                squares[i].classList.remove("piece")    
+                squares[i].classList.remove("freeze")  
+            } else {                       
+                squares[i].classList.add("noPiece")     
+            }       
         }  
+    }
+
+    /*
+    Congela uma peça
+    */
+    function freezePiece() {
+        for (index of currentPiece) {
+            if (currentPos+index > 0) {
+                squares[currentPos + index].classList.add("freeze")
+            }
+        }
     }
 
     /*
@@ -73,9 +91,19 @@ document.addEventListener('DOMContentLoaded'), () => {
     Desenha uma peça
     */
     function drawPiece() {
+        let frozenPiece = false
         for (index of currentPiece) {
             if(currentPos+index > 0){
-                squares[currentPos + index].classList.add("piece")
+                if (squares[currentPos + index].classList.contains("freeze")) {
+                    freezePiece()
+                    console.log("asdasd")
+                    frozenPiece = true
+                } else {
+                    squares[currentPos + index].classList.add("piece")
+                }
+            }
+            if (frozenPiece) {
+                break
             }
         }        
     }
@@ -102,13 +130,28 @@ document.addEventListener('DOMContentLoaded'), () => {
     }
 
     /*
+    Checa se o jogo acabou (game over)
+    */
+    function chkGameOver() {
+        if (squares[4].classList.contains("freeze")) {          
+            console.log("Game")
+            clearInterval(timerId)
+            timerId = null
+            return true
+        }
+        return false
+    }
+
+    /*
     Move a peça atual para baixo
     */
-    function moveDown() {  
-        stop()             
+    function moveDown() { 
+        console.log(gameOver) 
+        stop()         
         undrawPiece()
         currentPos += height
-        drawPiece()    
+        drawPiece()           
+        gameOver = chkGameOver() 
     }
 
     /*
@@ -118,10 +161,10 @@ document.addEventListener('DOMContentLoaded'), () => {
         let atLimit = false
         let pieceOnLeft = false
         for (index of currentPiece) {
-            if ((currentPos+index) % height === 0) {
+            if ( (currentPos+index) % height === 0) {
                 atLimit = true
                 break
-            } else if (index > 0 && squares[currentPos+index-1].classList.contains("freeze")) {
+            } else if ( (currentPos+index) > 0 && squares[currentPos+index-1].classList.contains("freeze")) {
                 pieceOnLeft = true
                 break
             }
@@ -130,9 +173,7 @@ document.addEventListener('DOMContentLoaded'), () => {
             undrawPiece()
             currentPos -= 1
             drawPiece()
-        } else if(pieceOnLeft){
-            updatePiece()
-        }
+        }       
     }
 
     /*
@@ -142,11 +183,10 @@ document.addEventListener('DOMContentLoaded'), () => {
         let atLimit = false
         let pieceOnRight = false
         for (index of currentPiece) {
-            if ((currentPos+index) % height === height-1) {
-                console.log(currentPos+index)
+            if ( (currentPos+index) % height === height-1) {                
                 atLimit = true
                 break
-            } else if (index > 0 && squares[currentPos+index+1].classList.contains("freeze")) {
+            } else if ( (currentPos+index) > 0 && squares[currentPos+index+1].classList.contains("freeze")) {
                 pieceOnRight = true
                 break
             }
@@ -155,8 +195,6 @@ document.addEventListener('DOMContentLoaded'), () => {
             undrawPiece()
             currentPos += 1
             drawPiece()
-        } else if(pieceOnRight){
-            updatePiece()
         }
     }
 
@@ -168,7 +206,7 @@ document.addEventListener('DOMContentLoaded'), () => {
             currentRotate++
         } else {
             currentRotate = 0
-        }
+        }  
 
         undrawPiece()
         currentPiece = pieces[currentShape][currentRotate]
@@ -179,19 +217,52 @@ document.addEventListener('DOMContentLoaded'), () => {
     Move a peça de acordo com a tecla pressionada
     */
     function control(e) {
-        if (e.keyCode === 37) {
-            moveLeft()
-        } else if (e.keyCode === 38) {
-            rotate()
-        } else if (e.keyCode === 39) {
-            moveRight()            
-        } else if (e.keyCode === 40) {
-            moveDown()
+        if (!gameOver && started) {
+            if (e.keyCode === 37) {                        
+                moveLeft()       
+            } else if (e.keyCode === 38) {
+                rotate()           
+            } else if (e.keyCode === 39) {     
+                moveRight()       
+            } else if (e.keyCode === 40) {
+                moveDown()           
+            }
         }
     }
 
-    document.addEventListener('keydown', control)
+    function goDown(e) {
+        if (!gameOver && started) {      
+            if (e.keyCode === 40) {
+                moveDown()
+            }
+        }
+    }
+
+    function startAndPause() {
+        if (gameOver || started === null) {
+            if (gameOver) {
+                drawGrids()
+            }
+            gameOver = false
+            currentPos = 4
+            currentRotate = 0
+            currentShape
+            currentPiece = nextPiece()               
+            timerId = setInterval(moveDown, 700)
+            started = true
+        } else if (started === true) {
+            started = false
+            clearInterval(timerId)
+        } else {
+            started = true
+            timerId = setInterval(moveDown, 700)
+        }
+
+    }
   
     drawGrids()
-    drawPiece() 
-} 
+    
+    startBt.addEventListener('click', startAndPause)    
+    document.addEventListener('keyup', control)
+    document.addEventListener('keydown', goDown)
+})
