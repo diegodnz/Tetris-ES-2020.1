@@ -7,6 +7,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const startBt = document.querySelector('#start-button')
     const restartBt = document.querySelector('#restart-button')
     
+    const colors = [
+        "blue",
+        "green",
+        "yellow",
+        "orange",
+        "puple",
+        "black",
+        "gray"
+    ]
     const height = 10
     
     const iShape = drawIShape(height)
@@ -220,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let atLimit = false
         let pieceOnRight = false
         for (index of currentPiece) {
-            if ((currentPos+index) % height === height-1) {                
+            if ((currentPos+index+1) % height === 0) {                
                 atLimit = true
                 break
             } else if ((currentPos+index) > 0 && squares[currentPos+index+1].classList.contains("freeze")) {
@@ -235,6 +244,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }         
     }
 
+    function tryRotation() {
+        if (currentPos % height < 1) {
+            undrawPiece()
+            currentPos += 1
+            drawPiece()
+            tryRotation()
+        } else if (currentPos % height > height-3) {
+            undrawPiece()
+            currentPos -= 1
+            drawPiece()
+            tryRotation()
+        }
+    }
+
     function rotate() {        
         if (currentRotation < 3) {
             currentRotation++
@@ -242,8 +265,11 @@ document.addEventListener('DOMContentLoaded', () => {
             currentRotation = 0
         }      
 
-        for (let i=0; i<3; i++)
-        undrawPiece()
+        for (let i=0; i<3; i++) {
+            tryRotation(i)
+        }            
+        tryRotation()  
+        undrawPiece()      
         currentPiece = pieces[currentShape][currentRotation]
         drawPiece()
     }
