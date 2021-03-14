@@ -4,41 +4,58 @@ document.addEventListener('DOMContentLoaded'), () => {
     const score = document.querySelector('#score')
     const startBt = document.querySelector('#start-button')
 
-    const width = 9
+    const height = 10
 
     const iShape = [
-        [0, width, width*2, width*3], 
+        [0, height, height*2, height*3], 
         [0, -1, 1, 2],  
-        [width, width-1, width+1, width+2], 
-        [0, width, width*2, width*3] 
+        [height, height-1, height+1, height+2], 
+        [0, height, height*2, height*3] 
     ]
 
     const zShape = [
-        [0, +1, -width, width+1],
-        [0, +1, width, width-1],
-        [0, +1, -width, width+1],
-        [0, +1, width, width-1]
+        [0, +1, -height, height+1],
+        [0, +1, height, height-1],
+        [0, +1, -height, height+1],
+        [0, +1, height, height-1]
     ]
 
     const lShape = [
-        [0, -width, width, width+1],
-        [0, 1, -1, width-1],
-        [0, width, -width, -width-1],
-        [0, -1, +1, -width+1]
+        [0, -height, height, height+1],
+        [0, 1, -1, height-1],
+        [0, height, -height, -height-1],
+        [0, -1, +1, -height+1]
     ]
 
     const strangeShape = [
-        [0, -width, -1, 1],
-        [0, -width, width, 1],
-        [0, 1, -1, width],
-        [0, -width, width, -1]
+        [0, -height, -1, 1],
+        [0, -height, height, 1],
+        [0, 1, -1, height],
+        [0, -height, height, -1]
     ]
 
-    let currentPos = 13
-    let currentPiece = strangeShape[3]
+    let pieces = [iShape, zShape, lShape, strangeShape]
+    let currentPos = 4
+    let currentPiece = nextPiece()
+    timer = setInterval(moveDown, 60)
+
+    function nextPiece() {
+        i = Math.floor(Math.random() * pieces.length)
+        return pieces[i][0]
+    }
 
     function drawGrids() {
-        squares.forEach(div => div.classList.add("noPiece"))
+        for (let i=0; i<squares.length; i++) {           
+            squares[i].classList.add("noPiece")            
+        }  
+    }
+
+    function undrawPiece() {
+        for (index of currentPiece) {
+            if (currentPos+index > 0) {
+                squares[currentPos + index].classList.remove("piece")
+            }
+        }
     }
 
     function drawPiece() {
@@ -49,10 +66,25 @@ document.addEventListener('DOMContentLoaded'), () => {
         }        
     }
 
-    function testPiece() {
-        squares[4].classList.add("piece")
+    function stop() {
+        for (index of currentPiece) {
+            if (index+currentPos+height > 199 || squares[index+currentPos+height].classList.contains("freeze")) {   
+                currentPiece.forEach(index => squares[currentPos+index].classList.add("freeze"))           
+                currentPos = 4
+                currentPiece = nextPiece()
+                break
+            }                       
+        }
     }
 
-    drawGrids();
-    drawPiece();
+    function moveDown() {  
+        stop()             
+        undrawPiece()
+        currentPos += height
+        drawPiece()    
+    }
+
+    nextPiece()    
+    drawGrids()
+    drawPiece() 
 } 
