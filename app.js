@@ -2,8 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const grid = document.querySelector('.grid')
     let squares = Array.from(document.querySelectorAll('.grid div'))
     let nextSquares = Array.from(document.querySelectorAll('.next-piece-grid div'))
-    const gameScore = document.querySelector('#score')
-    const gameOverMsg = document.querySelector('#gameover')
+    const gameScore = document.querySelector('#score')    
     const startBt = document.querySelector('#start-button')
     const restartBt = document.querySelector('#restart-button')
     
@@ -167,8 +166,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (squares[4].classList.contains("freeze")) {         
             clearInterval(timerId)
             timerId = null
-            gameOverMsg.innerHTML = "Game Over!!"
+            alert("Game Over!!")
             score = 0
+            squares.colors
             return true
         }
         return false
@@ -301,8 +301,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             gameOver = false        
             score = 0    
-            gameScore.innerHTML = score
-            gameOverMsg.innerHTML = ''
+            startBt.innerHTML = "Pause"  
+            gameScore.innerHTML = score            
             nextShape = Math.floor(Math.random() * pieces.length)            
             currentPos = 4
             currentRotation = 0
@@ -312,9 +312,11 @@ document.addEventListener('DOMContentLoaded', () => {
             timerId = setInterval(moveDown, 700)
             started = true
         } else if (started === true) {
+            startBt.innerHTML = "Unpause"  
             started = false
             clearInterval(timerId)
         } else {
+            startBt.innerHTML = "Pause"  
             started = true
             timerId = setInterval(moveDown, 700)
         }        
@@ -324,8 +326,8 @@ document.addEventListener('DOMContentLoaded', () => {
         drawGrids()
         gameOver = false      
         score = 0      
-        gameScore.innerHTML = score
-        gameOverMsg.innerHTML = ''
+        gameScore.innerHTML = score    
+        startBt.innerHTML = "Pause"    
         nextShape = Math.floor(Math.random() * pieces.length)        
         currentPos = 4
         currentRotation = 0

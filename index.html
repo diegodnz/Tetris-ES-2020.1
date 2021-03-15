@@ -2,18 +2,44 @@
 <html lang="en" dir="ltr">
     <head>
         <meta charset="utf-8">
-        <script src="tetris.js" charset="utf-8"></script>
+        <script src="app.js" charset="utf-8"></script>
         <link rel="stylesheet" href="style.css"></link>
         <title> TETRIS </title>
     </head>
- 
-    <body>
-        <h3>Score: <span id="score">0</span></h3>
-        <h3><span id="gameover"></span></h3>
-        <button id="start-button">Start/Pause</button>
-        <button id="restart-button">Restart</button>
- 
+
+    <body>        
+
+        <div class="options">  
+            <h3 class="score">Score :  <span id="score">0</span></h3>           
+            <div class="treat-wrapper">
+                <button class="treat-button" id="start-button">Start!</button>
+                <button class="treat-button" id="restart-button">Restart!</button>
+            </div>                         
+        </div>         
+
         <div class="container">
+            <div class="next-piece-grid">
+                <div></div>
+                <div></div>  
+                <div></div>
+                <div></div>      
+                <div></div>
+                <div></div>  
+                <div></div>
+                <div></div>  
+                <div></div>    
+                <div></div>
+                <div></div>      
+                <div></div>
+                <div></div>  
+                <div></div>
+                <div></div>  
+                <div></div>     
+                <div></div>  
+                <div></div>
+                <div></div>  
+                <div></div>                    
+            </div>
             <div class="grid">            
                 <div></div>
                 <div></div>
@@ -216,30 +242,12 @@
                 <div></div>
                 <div></div>           
             </div>
- 
-            <div class="next-piece-grid">
-                <div></div>
-                <div></div>  
-                <div></div>
-                <div></div>      
-                <div></div>
-                <div></div>  
-                <div></div>
-                <div></div>  
-                <div></div>    
-                <div></div>
-                <div></div>      
-                <div></div>
-                <div></div>  
-                <div></div>
-                <div></div>  
-                <div></div>     
-                <div></div>  
-                <div></div>
-                <div></div>  
-                <div></div>                    
-            </div>
+
         </div>
- 
+
     </body>
+
+    <audio controls>
+        <source src="monster-song.mp3" type="audio/mpeg">
+    </audio>
 </html>
