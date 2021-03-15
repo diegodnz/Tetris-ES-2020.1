@@ -7,39 +7,43 @@
         <title> TETRIS </title>
     </head>
 
-    <body>        
-
-        <div class="options">  
-            <h3 class="score">Score :  <span id="score">0</span></h3>           
-            <div class="treat-wrapper">
-                <button class="treat-button" id="start-button">Start!</button>
-                <button class="treat-button" id="restart-button">Restart!</button>
-            </div>                         
-        </div>         
+    <body>               
 
         <div class="container">
-            <div class="next-piece-grid">
-                <div></div>
-                <div></div>  
-                <div></div>
-                <div></div>      
-                <div></div>
-                <div></div>  
-                <div></div>
-                <div></div>  
-                <div></div>    
-                <div></div>
-                <div></div>      
-                <div></div>
-                <div></div>  
-                <div></div>
-                <div></div>  
-                <div></div>     
-                <div></div>  
-                <div></div>
-                <div></div>  
-                <div></div>                    
-            </div>
+            <div class="options">  
+                <h3 class="score">Score :  <span id="score">0</span></h3>           
+                <div class="treat-wrapper">
+                    <button class="treat-button" id="start-button">Start!</button>
+                    <button class="treat-button" id="restart-button">Restart!</button>
+                </div>    
+                <div class="next-piece-grid">
+                    <h4 class="nextPiece">Next Piece :       <span id="score"></span></h3> 
+                    <div></div>
+                    <div></div>  
+                    <div></div>
+                    <div></div>      
+                    <div></div>
+                    <div></div>  
+                    <div></div>
+                    <div></div>  
+                    <div></div>    
+                    <div></div>
+                    <div></div>      
+                    <div></div>
+                    <div></div>  
+                    <div></div>
+                    <div></div>  
+                    <div></div>     
+                    <div></div>  
+                    <div></div>
+                    <div></div>  
+                    <div></div>                    
+                </div>   
+                <audio controls class="myAudio">
+                    <source src="monster-song.mp3" type="audio/mpeg">
+                </audio>                  
+            </div> 
+            
             <div class="grid">            
                 <div></div>
                 <div></div>
@@ -247,7 +251,4 @@
 
     </body>
 
-    <audio controls>
-        <source src="monster-song.mp3" type="audio/mpeg">
-    </audio>
 </html>

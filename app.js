@@ -5,16 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameScore = document.querySelector('#score')    
     const startBt = document.querySelector('#start-button')
     const restartBt = document.querySelector('#restart-button')
+    const musicPlayer = document.querySelector(".myAudio")
     
-    const colors = [
-        "blue",
-        "green",
-        "yellow",
-        "orange",
-        "puple",
-        "black",
-        "gray"
-    ]
     const height = 10
     
     const iShape = drawIShape(height)
@@ -69,12 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let pieces = [iShape, zShape, lShape, strangeShape, squareShape]
+    let oldPosition
     let currentPos
     let currentRotation
     let currentShape
     let currentPiece 
     let nextShape
-    let timerId
     let score = 0
     let gameOver = false
     let started = null
@@ -114,28 +106,24 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePiece()
     }
 
-    function drawPiece() {
-        let frozenPiece = false
-        for (index of currentPiece) {
-            if (currentPos+index > 0) {
-                if (squares[currentPos + index].classList.contains("freeze")) {
-                    freezePiece()                    
-                    frozenPiece = true
-                } else {
+    function drawPiece() {        
+        if (currentPiece.some(index => currentPos+index > 0 && squares[currentPos + index].classList.contains("freeze"))) {
+            currentPos = oldPosition
+            freezePiece()
+        } else {
+            currentPiece.forEach(index => {
+                if (currentPos + index > 0) {
                     squares[currentPos + index].classList.add("piece")
                 }
-            }
-            if (frozenPiece) {
-                break
-            }
-        }        
+            })
+        }             
     }
 
     function displayNext() {
         nextSquares.forEach(square => square.classList.remove("piece"))
         let piece
         if (nextShape === 0) {
-            piece = drawIShape(4)[0]
+            piece = drawIShape(4)[1]
         } else if (nextShape === 1) {
             piece = drawZShape(4)[0]
         } else if (nextShape === 2) {
@@ -163,18 +151,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function chkGameOver() {
-        if (squares[4].classList.contains("freeze")) {         
-            clearInterval(timerId)
-            timerId = null
-            alert("Game Over!!")
-            score = 0
-            squares.colors
+        if (squares[3].classList.contains("freeze") || squares[4].classList.contains("freeze") || squares[5].classList.contains("freeze")) {        
+            startBt.innerHTML = "Start!"
+            //alert("Game Over!!")            
+            score = 0  
             return true
         }
         return false
     }
 
-    function addScore() {
+    function addScore() {   
         for (let i=0; i<200; i+=10) {
             complete = true
             for (let j=i; j<i+10; j++) {
@@ -194,16 +180,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 squares = removedSquares.concat(squares)
                 squares.forEach(cell => grid.appendChild(cell))
             }
-        }
+        }        
     }
 
-    function moveDown() {     
-        stop()        
+    function moveDown() {    
         undrawPiece()
+        oldPosition = currentPos
         currentPos += height
-        drawPiece()        
-        gameOver = chkGameOver() 
+        drawPiece(oldPosition)  
+        gameOver = chkGameOver()         
+        stop()         
         addScore()
+        
     }
 
     function moveLeft() {      
@@ -244,34 +232,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }         
     }
 
+    function leftSide() {
+        return currentPos % height < 5
+    }
+
     function tryRotation() {
-        if (currentPos % height < 1) {
-            undrawPiece()
-            currentPos += 1
-            drawPiece()
-            tryRotation()
-        } else if (currentPos % height > height-3) {
-            undrawPiece()
-            currentPos -= 1
-            drawPiece()
-            tryRotation()
+        let nextRotationI = nextRotation()
+        if (leftSide()) {
+            if (pieces[currentShape][nextRotationI].some(index => (currentPos + index) > 199 || (currentPos + index) < 0 || squares[currentPos + index].classList.contains("freeze") || (currentPos+index+1) % height === 0)) {
+                return false
+            } else if (pieces[currentShape][nextRotationI].some(index => (currentPos + index + height) > 199 || (currentPos + index + height) < 0 || squares[currentPos + index + height].classList.contains("freeze") || (currentPos+index+1) % height === 0)) {
+                return false
+            } else {
+                return true
+            }
+        } else {
+            if (pieces[currentShape][nextRotationI].some(index => (currentPos + index) > 199 || (currentPos + index) < 0 || squares[currentPos + index].classList.contains("freeze") || (currentPos+index) % height === 0)) {
+                return false
+            } else if (pieces[currentShape][nextRotationI].some(index => (currentPos + index + height) > 199 || (currentPos + index + height) < 0 || squares[currentPos + index + height].classList.contains("freeze") || (currentPos+index) % height === 0)) {
+                return false
+            } else {
+                return true
+            }
         }
     }
 
-    function rotate() {        
+    function nextRotation() {
         if (currentRotation < 3) {
-            currentRotation++
+            return currentRotation + 1
         } else {
-            currentRotation = 0
-        }      
+            return 0
+        } 
+    }
 
-        for (let i=0; i<3; i++) {
-            tryRotation(i)
-        }            
-        tryRotation()  
-        undrawPiece()      
-        currentPiece = pieces[currentShape][currentRotation]
-        drawPiece()
+    function rotate() {        
+        if (tryRotation()) {
+            currentRotation = nextRotation()
+            undrawPiece()      
+            currentPiece = pieces[currentShape][currentRotation]
+            drawPiece()
+        }
     }
 
     function control(e) { 
@@ -294,6 +294,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function gameLoop() {
+        while (!gameOver && started) {    
+            moveDown()            
+            await sleep(300)
+        }    
+        if (gameOver) {
+            pauseMusic()
+            alert("Game Over!!") 
+        }    
+    }
+
     function startAndPause() {     
         if (gameOver || started === null) {
             if (gameOver) {
@@ -304,38 +319,51 @@ document.addEventListener('DOMContentLoaded', () => {
             startBt.innerHTML = "Pause"  
             gameScore.innerHTML = score            
             nextShape = Math.floor(Math.random() * pieces.length)            
-            currentPos = 4
-            currentRotation = 0
-            currentShape
-            currentPiece = nextPiece()   
-            clearInterval(timerId)             
-            timerId = setInterval(moveDown, 700)
+            currentPos = -6
+            currentRotation = 0           
+            currentPiece = nextPiece()  
             started = true
+            gameLoop()
+            playMusic()
         } else if (started === true) {
-            startBt.innerHTML = "Unpause"  
+            startBt.innerHTML = "Resume"  
             started = false
-            clearInterval(timerId)
+            pauseMusic()          
         } else {
             startBt.innerHTML = "Pause"  
-            started = true
-            timerId = setInterval(moveDown, 700)
+            started = true    
+            gameLoop()
+            playMusic()        
         }        
     }
 
-    function restartGame() {
-        drawGrids()
-        gameOver = false      
+    function restartGame() {    
+        playMusic()    
+        drawGrids()      
         score = 0      
         gameScore.innerHTML = score    
         startBt.innerHTML = "Pause"    
         nextShape = Math.floor(Math.random() * pieces.length)        
-        currentPos = 4
-        currentRotation = 0
-        currentShape
-        currentPiece = nextPiece()  
-        clearInterval(timerId)             
-        timerId = setInterval(moveDown, 700)
-        started = true
+        currentPos = -6
+        currentRotation = 0        
+        currentPiece = nextPiece()   
+        if (!started || gameOver) {       
+            started = true
+            gameOver = false   
+            gameLoop()
+        }        
+    }
+
+    function playMusic() {
+        musicPlayer.classList.add("playing")
+        musicPlayer.classList.remove("paused")
+        musicPlayer.play();
+    }
+
+    function pauseMusic() {
+        musicPlayer.classList.add("paused")
+        musicPlayer.classList.remove("playing")
+        musicPlayer.pause();
     }
 
     drawGrids()
@@ -344,4 +372,4 @@ document.addEventListener('DOMContentLoaded', () => {
     restartBt.addEventListener('click', restartGame)
     document.addEventListener('keydown', control)
     document.addEventListener('keydown', goDown)
-})
+}) 
