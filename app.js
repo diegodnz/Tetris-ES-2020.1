@@ -137,13 +137,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updatePiece() {
-        currentPos = 4
+        currentPos = -26
         currentPiece = nextPiece()        
     }
 
     function stop() {
         for (index of currentPiece) {
-            if (index+currentPos+height > 199 || squares[index+currentPos+height].classList.contains("freeze")) {   
+            if (index+currentPos+height > 199 || (index+currentPos+height > 0 && squares[index+currentPos+height].classList.contains("freeze"))) {   
                 freezePiece()       
                 break
             }                       
@@ -319,7 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
             startBt.innerHTML = "Pause"  
             gameScore.innerHTML = score            
             nextShape = Math.floor(Math.random() * pieces.length)            
-            currentPos = -6
+            currentPos = -26
             currentRotation = 0           
             currentPiece = nextPiece()  
             started = true
