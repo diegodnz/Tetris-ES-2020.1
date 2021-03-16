@@ -302,8 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
             moveDown()            
             await sleep(300)
         }    
-        if (gameOver) {
-            pauseMusic()
+        if (gameOver) {            
             alert("Game Over!!") 
         }    
     }

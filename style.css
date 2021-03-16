@@ -135,6 +135,7 @@ body {
     height: 120px;   
     display: flex;
     margin-top: 18%;
+    margin-bottom: 10%;
     flex-direction: column;
     flex-wrap: wrap;
     background-color: black;
@@ -151,11 +152,11 @@ body {
     background-color: black;
 }
 .piece {
-    background-color: rgb(99, 245, 1);
+    background-color: rgb(1, 245, 13);
 }
 
 .freeze {
-   background-color: rgb(99, 245, 1);
+    background-color: rgb(1, 245, 13);
 }
 
 .gameOver {
@@ -212,7 +213,7 @@ input[type="range"]::-moz-slider-thumb {
   display: flex;
   align-items: center;
   margin-top: auto;
-  width: 35%;
+  width: 45%;
 }
 
 .range-wrap:hover input[type="range"] {
