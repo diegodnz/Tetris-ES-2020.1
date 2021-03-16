@@ -4,7 +4,7 @@
 
 .treat-button {
   font-family: 'Rock Salt', cursive;
-  font-size: 2vmin;
+  font-size: 1.5vmin;
   appearance: none;
   background: linear-gradient(to bottom,#25aa19, #25aa19);
   border: none;
@@ -85,8 +85,8 @@
 
 
 .options {   
-    flex: 1;
-    align-items: right;   
+    width: 300px;
+    align-items: left;   
     margin-top: -1%;  
     color: white; font-weight: bold; font-size: 20px; 
 }
@@ -94,6 +94,7 @@
 .score {
     margin-left: 10%;
     font-size: 25px;
+    width: 200px;
 }
 
 .container {   
@@ -105,16 +106,12 @@
 
 body {       
     background-image: url("https://images2.alphacoders.com/461/thumb-1920-461037.jpg");
-    background-size:cover;
-    background-repeat:no-repeat;
-    background-attachment: fixed;    
-    background-size: 100%;
-    background-repeat: no-repeat;  
+    flex: column;
+    flex-direction: column-reverse; 
     font-family: 'Rock Salt', cursive;
 }
 
 .grid {   
-    margin-right: 60%;
     width: 220px;
     height: 440px;
     display: flex;    
@@ -165,10 +162,73 @@ body {
    background-color: black;
 }
 
-.myAudio {
-  margin-top: 20%;
-}
-
 .nextPiece {
   margin-right: 6px;
+}
+
+@keyframes spin { 100% { transform: rotate(360deg) scale(0); } }
+
+
+input[type="range"] {
+  -webkit-appearance: none;
+  background: linear-gradient(to right,
+    white 0%, white 50%,
+    #ffffff22 50%, #ffffff22 100%);
+  cursor: pointer;
+  height: 3px;
+  margin: 0;
+  transition: 0.1s ease-in;
+  vertical-align: middle;
+  width: 100%;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background: #fff;
+  border-radius: 8px;
+  height: 0;
+  transition: 0.1s ease-in;
+  width: 0;
+}
+
+input[type="range"]::-moz-slider-thumb {
+  -moz-appearance: none;
+  background: #fff;
+  border-radius: 8px;
+  height: 0;
+  transition: 0.1s ease-in;
+  width: 0;
+}
+
+.range-icon {
+  width: 20px;
+  height: auto;
+  margin-right: 0.5rem;
+}
+
+.range-wrap {
+  display: flex;
+  align-items: center;
+  margin-top: auto;
+  width: 35%;
+}
+
+.range-wrap:hover input[type="range"] {
+  opacity: 1;
+}
+
+.range-wrap:hover input[type="range"]::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+}
+
+.range-wrap:hover input[type="range"]::-moz-slider-thumb {
+  width: 16px;
+  height: 16px;
+}
+
+input[type="range"]:focus {
+  outline: none;
 }

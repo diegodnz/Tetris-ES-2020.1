@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameScore = document.querySelector('#score')    
     const startBt = document.querySelector('#start-button')
     const restartBt = document.querySelector('#restart-button')
-    const musicPlayer = document.querySelector(".myAudio")
     
     const height = 10
     
@@ -309,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }    
     }
 
-    function startAndPause() {     
+    function startAndPause() {             
         if (gameOver || started === null) {
             if (gameOver) {
                 drawGrids()
@@ -324,21 +323,21 @@ document.addEventListener('DOMContentLoaded', () => {
             currentPiece = nextPiece()  
             started = true
             gameLoop()
-            playMusic()
+            sound.play()           
         } else if (started === true) {
             startBt.innerHTML = "Resume"  
             started = false
-            pauseMusic()          
+            sound.pause()                  
         } else {
             startBt.innerHTML = "Pause"  
             started = true    
             gameLoop()
-            playMusic()        
+            sound.play()                  
         }        
     }
 
-    function restartGame() {    
-        playMusic()    
+    function restartGame() {   
+        sound.play()             
         drawGrids()      
         score = 0      
         gameScore.innerHTML = score    
@@ -354,17 +353,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }        
     }
 
-    function playMusic() {
-        musicPlayer.classList.add("playing")
-        musicPlayer.classList.remove("paused")
-        musicPlayer.play();
-    }
-
-    function pauseMusic() {
-        musicPlayer.classList.add("paused")
-        musicPlayer.classList.remove("playing")
-        musicPlayer.pause();
-    }
+    function volume(e) {       
+        e.target.style.background = "linear-gradient(to right, white 0%, white " + e.target.value + "%, #ffffff2f " + e.target.value + "%, #ffffff7f 100%)";
+        sound.volume = e.target.value / 100;
+      }
 
     drawGrids()
     nextSquares.forEach(square => square.classList.add("noPiece"))
@@ -372,4 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
     restartBt.addEventListener('click', restartGame)
     document.addEventListener('keydown', control)
     document.addEventListener('keydown', goDown)
+    document.querySelector(".range").addEventListener("change", volume);
+    const sound = document.getElementById("sound");  
+    
 }) 
