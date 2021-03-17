@@ -104,6 +104,17 @@
     flex-wrap: wrap;    
 }
 
+.cima {
+  margin-left: 33.4%;
+  width: fit-content;
+}
+
+.controle {
+  margin-left: 30%;
+  width: fit-content;
+  margin-top: 0.3%;
+}
+
 body {       
     background-image: url("https://images2.alphacoders.com/461/thumb-1920-461037.jpg");
     flex: column;

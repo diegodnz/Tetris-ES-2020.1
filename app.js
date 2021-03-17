@@ -5,6 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameScore = document.querySelector('#score')    
     const startBt = document.querySelector('#start-button')
     const restartBt = document.querySelector('#restart-button')
+    const setaCima = document.querySelector('#cima')
+    const setaBaixo = document.querySelector('#baixo')
+    const setaEsquerda = document.querySelector('#esquerda')
+    const setaDireita = document.querySelector('#direita')
     
     const height = 10
     
@@ -182,60 +186,66 @@ document.addEventListener('DOMContentLoaded', () => {
         }        
     }
 
-    function moveDown() {    
-        undrawPiece()
-        oldPosition = currentPos
-        currentPos += height
-        drawPiece(oldPosition)  
-        gameOver = chkGameOver()         
-        stop()         
-        addScore()
+    function moveDown() {   
+        if (!gameOver && started) { 
+            undrawPiece()
+            oldPosition = currentPos
+            currentPos += height
+            drawPiece(oldPosition)  
+            gameOver = chkGameOver()         
+            stop()         
+            addScore()
+        }
         
     }
 
     function moveLeft() {      
-        let atLimit = false
-        let pieceOnLeft = false
-        for (index of currentPiece) {
-            if ((currentPos+index) % height === 0) {
-                atLimit = true
-                break
-            } else if ((currentPos+index) > 0 && squares[currentPos+index-1].classList.contains("freeze")) {
-                pieceOnLeft = true
-                break
+        if (!gameOver && started) {
+            let atLimit = false
+            let pieceOnLeft = false
+            for (index of currentPiece) {
+                if ((currentPos+index) % height === 0) {
+                    atLimit = true
+                    break
+                } else if ((currentPos+index) > 0 && squares[currentPos+index-1].classList.contains("freeze")) {
+                    pieceOnLeft = true
+                    break
+                }
             }
-        }
-        if (!atLimit && !pieceOnLeft) {
-            undrawPiece()
-            currentPos -= 1
-            drawPiece()
+            if (!atLimit && !pieceOnLeft) {
+                undrawPiece()
+                currentPos -= 1
+                drawPiece()
+            }
         }
     }
 
     function moveRight() {       
-        let atLimit = false
-        let pieceOnRight = false
-        for (index of currentPiece) {
-            if ((currentPos+index+1) % height === 0) {                
-                atLimit = true
-                break
-            } else if ((currentPos+index) > 0 && squares[currentPos+index+1].classList.contains("freeze")) {
-                pieceOnRight = true
-                break
+        if (!gameOver && started) {
+            let atLimit = false
+            let pieceOnRight = false
+            for (index of currentPiece) {
+                if ((currentPos+index+1) % height === 0) {                
+                    atLimit = true
+                    break
+                } else if ((currentPos+index) > 0 && squares[currentPos+index+1].classList.contains("freeze")) {
+                    pieceOnRight = true
+                    break
+                }
             }
-        }
-        if (!atLimit && !pieceOnRight) {
-            undrawPiece()
-            currentPos += 1
-            drawPiece()
-        }         
+            if (!atLimit && !pieceOnRight) {
+                undrawPiece()
+                currentPos += 1
+                drawPiece()
+            }    
+        }     
     }
 
     function leftSide() {
         return currentPos % height < 5
     }
 
-    function tryRotation() {
+    function tryRotation() {        
         let nextRotationI = nextRotation()
         if (leftSide()) {
             if (pieces[currentShape][nextRotationI].some(index => (currentPos + index) > 199 || (currentPos + index) < 0 || squares[currentPos + index].classList.contains("freeze") || (currentPos+index+1) % height === 0)) {
@@ -253,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 return true
             }
-        }
+        }        
     }
 
     function nextRotation() {
@@ -264,20 +274,22 @@ document.addEventListener('DOMContentLoaded', () => {
         } 
     }
 
-    function rotate() {        
-        if (tryRotation()) {
-            currentRotation = nextRotation()
-            undrawPiece()      
-            currentPiece = pieces[currentShape][currentRotation]
-            drawPiece()
+    function rotate() {    
+        if (!gameOver && started) {    
+            if (tryRotation()) {
+                currentRotation = nextRotation()
+                undrawPiece()      
+                currentPiece = pieces[currentShape][currentRotation]
+                drawPiece()
+            }
         }
     }
 
     function control(e) { 
         if (!gameOver && started) {
-            if (e.keyCode === 37) {                        
+            if (e.keyCode === 37 || e == 37) {                        
                 moveLeft()       
-            } else if (e.keyCode === 38) {
+            } else if (e.keyCode === 38 || e == 38) {
                 rotate()           
             } else if (e.keyCode === 39) {     
                 moveRight()       
@@ -363,6 +375,10 @@ document.addEventListener('DOMContentLoaded', () => {
     restartBt.addEventListener('click', restartGame)
     document.addEventListener('keydown', control)
     document.addEventListener('keydown', goDown)
+    setaEsquerda.addEventListener('click', moveLeft)
+    setaCima.addEventListener('click', rotate)
+    setaDireita.addEventListener('click', moveRight)
+    setaBaixo.addEventListener('click', moveDown)
     document.querySelector(".range").addEventListener("change", volume);
     const sound = document.getElementById("sound");  
     
